@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Red box Green box</title>
+    <style type="text/css" media="screen">
+        html {
+            height: 100%;
+            display: table;
+            margin: auto;
+        }
+        body {
+            height: 100%;
+            display: table-cell;
+            vertical-align: middle;
+        }
+        .red-box {
+            width: 496px;
+            height: 496px;
+            border: 2px solid #000;
+            background-color: red;
+            vertical-align: middle;
+            position: relative;
+        }
+        .green-box {
+            width: 46px;
+            height: 46px;
+            border: 2px solid #000;
+            background-color: green;
+            text-align: center;
+            position: absolute;
+            top: 223px;
+            left: 223px;
+        }
+        .green-box:hover {
+            background-color: lightgreen;
+            cursor: pointer;
+        }
+        @media screen and (max-width: 499px) {
+            .red-box {
+                width: 246px;
+                height: 246px;
+            }
+
+            .green-box {
+                top: 98px;
+                left: 98px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="red-box">
+        <div class="green-box">
+            <p class="distance">0</p>
+        </div>
+    </div>
+    <script type="text/javascript">
+        const redBox = document.querySelector('.red-box');
+        const greenBox = document.querySelector('.green-box');
+        const dis = document.querySelector('.distance');
+        let drag_flag = false;
+        let cx = 223, cy = 223, sx = 0, sy = 0, ctop = 0, cleft = 0;
+        let red_range = 0;
+        greenBox.addEventListener('mousedown', function (event) {
+            drag_flag = true;
+            sx = event.pageX;
+            sy = event.pageY;
+            curcss = window.getComputedStyle(greenBox);
+            ctop = parseInt(curcss.getPropertyValue('top'));
+            cleft = parseInt(curcss.getPropertyValue('left'));
+
+            red_range = parseInt(window.getComputedStyle(redBox).getPropertyValue('width'));
+
+            if (red_range > 300) {
+                cx = 223;
+                cy = 223;
+            } else {
+                cx = 98;
+                cy = 98;
+            }
+
+        }, false);
+        document.addEventListener('mouseup', function (event) {
+            drag_flag = false;
+        }, false);
+
+        const rangeRestrict = i => {
+            if (i < -2) {
+                return -2;
+            }
+            if (red_range > 300) {
+                if (i > 448) {
+                    return 448;
+                }
+            } else {
+                if (i > 198) {
+                    return 198;
+                }
+            }
+            return i;
+        }
+        const calDistance = (x1, y1, x2, y2) => {
+            return Math.hypot(x2-x1, y2-y1);
+        }
+        document.addEventListener('mousemove', function (event) {
+            if (drag_flag) {
+                let x = event.pageX;
+                let y = event.pageY;
+
+                let ntop = rangeRestrict(ctop + (y - sy));
+                let nleft = rangeRestrict(cleft + (x - sx));
+
+                let d = calDistance(cy, cy, nleft, ntop);
+                dis.innerText = d.toFixed(2);
+
+                greenBox.style.top = ntop+"px";
+                greenBox.style.left = nleft+"px";
+            }
+        }, false);
+    </script>
+</body>
+</html>
